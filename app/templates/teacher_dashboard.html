@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Teacher Dashboard</h2>
+<a href="{{ url_for('routes.add_question') }}" class="btn btn-success">Add Question</a>
+<a href="{{ url_for('routes.add_assessment') }}" class="btn btn-success">Add Assessment</a>
+
+<h3>Assessments</h3>
+<ul>
+    {% for assessment in assessments %}
+    <li>{{ assessment.assessment_name }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

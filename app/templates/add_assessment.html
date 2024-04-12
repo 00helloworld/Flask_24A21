@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Add Assessment</h2>
+<form method="post">
+    <div class="form-group">
+        <label for="assessment_name">Assessment Name:</label>
+        <input type="text" class="form-control" id="assessment_name" name="assessment_name" required>
+    </div>
+    <div class="form-group">
+        <label for="duration">Duration (minutes):</label>
+        <input type="number" class="form-control" id="duration" name="duration" required>
+    </div>
+    <div class="form-group">
+        <label for="end_date">End Date:</label>
+        <input type="datetime-local" class="form-control" id="end_date" name="end_date" required>
+    </div>
+    <div class="form-group">
+        <label for="attempts_allowed">Attempts Allowed:</label>
+        <input type="number" class="form-control" id="attempts_allowed" name="attempts_allowed" required>
+    </div>
+    <div class="form-group">
+        <input type="checkbox" class="form-check-input" id="immediate_feedback" name="immediate_feedback">
+        <label class="form-check-label" for="immediate_feedback">Immediate Feedback</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Assessment</button>
+</form>
+{% endblock %}

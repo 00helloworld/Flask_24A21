@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Student Dashboard</h2>
+
+<h3>Assessments</h3>
+<ul>
+    {% for assessment in assessments %}
+    <li><a href="{{ url_for('routes.attempt_assessment', assessment_id=assessment.id) }}">{{ assessment.assessment_name }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
