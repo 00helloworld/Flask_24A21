@@ -3,8 +3,8 @@ from flask import render_template, request, redirect, url_for, flash, session
 from app import app, db
 from app.models import Question, FormativeAssessment
 
-@app.route('/dashboard')
-def student_dashboard():
+@app.route('/tdashboard')
+def teacher_dashboard():
     """教师仪表板功能"""
     if 'user_id' not in session or session['role_id'] != 1:
         return redirect(url_for('routes.login'))

@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, url_for, flash, session
 from app import app, db
 from app.models import FormativeAssessment, UserAttempt
 
-@app.route('/dashboard')
+@app.route('/sdashboard')
 def student_dashboard():
     """学生仪表板功能"""
     if 'user_id' not in session or session['role_id'] != 2:
