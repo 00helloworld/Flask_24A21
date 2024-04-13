@@ -48,8 +48,16 @@ def view_questions():
     if 'user_id' not in session or session['role'] != 'teacher':
         return redirect(url_for('login'))
 
-    questions = Question.query.all()
-    return render_template('view_questions.html', questions=questions)
+    question_type = request.args.get('type')  # 获取查询参数，默认为'all'
+
+    if question_type == 'type1':
+        questions = Question.query.filter_by(question_type='Type1').all()
+    elif question_type == 'type2':
+        questions = Question.query.filter_by(question_type='Type2').all()
+    else:
+        questions = Question.query.all()
+
+    return render_template('view_questions.html', questions=questions, selected_type=question_type)
 
 @app.route('/edit_question/<int:question_id>', methods=['GET', 'POST'])
 def edit_question(question_id):
