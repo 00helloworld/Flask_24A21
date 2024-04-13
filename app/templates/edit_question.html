@@ -5,6 +5,13 @@
     <h2>Edit Question</h2>
     <form method="post">
         <div class="mb-3">
+            <label for="question_type" class="form-label">Question type</label>
+            <select class="form-control" id="question_type" name="question_type" required>
+                <option value="Type1" {% if question.question_type == 'Type1' %}selected{% endif %}>Type1</option>
+                <option value="Type2" {% if question.question_type == 'Type2' %}selected{% endif %}>Type2</option>
+            </select>
+        </div>
+        <div class="mb-3">
             <label for="question_text" class="form-label">Question Text</label>
             <textarea class="form-control" id="question_text" name="question_text" rows="3" required>{{ question.question_text }}</textarea>
         </div>

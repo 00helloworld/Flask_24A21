@@ -60,6 +60,7 @@ def edit_question(question_id):
     question = Question.query.get_or_404(question_id)
 
     if request.method == 'POST':
+        question.question_type = request.form.get('question_type')
         question.question_text = request.form.get('question_text')
         question.option_a = request.form.get('option_a')
         question.option_b = request.form.get('option_b')
