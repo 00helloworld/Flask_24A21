@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Manage Formative Assessments</h2>
+    
+    <ul>
+        <li style="list-style-type: none"><a href="{{ url_for('add_assessment') }}" class="btn btn-success">Add Assessment</a></li>
+    </ul>
+
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Duration</th>
+                <th>Deadline</th>
+                <th>Attempts Allowed</th>
+                <th>Questions</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for assessment in assessments %}
+            <tr>
+                <td>{{ assessment.id }}</td>
+                <td>{{ assessment.name }}</td>
+                <td>{{ assessment.parameters.get('duration') }}</td>
+                <td>{{ assessment.parameters.get('deadline') }}</td>
+                <td>{{ assessment.parameters.get('attempts') }}</td>
+                <td>
+                    {% for question in assessment.questions %}
+                    {{ question.question_text }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{{ url_for('edit_assessment', assessment_id=assessment.id) }}" class="btn btn-primary">Edit</a>
+                    <form action="{{ url_for('delete_assessment', assessment_id=assessment.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,28 +1,158 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Add Assessment</h2>
-<form method="post">
-    <div class="form-group">
-        <label for="assessment_name">Assessment Name:</label>
-        <input type="text" class="form-control" id="assessment_name" name="assessment_name" required>
-    </div>
-    <div class="form-group">
-        <label for="duration">Duration (minutes):</label>
-        <input type="number" class="form-control" id="duration" name="duration" required>
-    </div>
-    <div class="form-group">
-        <label for="end_date">End Date:</label>
-        <input type="datetime-local" class="form-control" id="end_date" name="end_date" required>
-    </div>
-    <div class="form-group">
-        <label for="attempts_allowed">Attempts Allowed:</label>
-        <input type="number" class="form-control" id="attempts_allowed" name="attempts_allowed" required>
-    </div>
-    <div class="form-group">
-        <input type="checkbox" class="form-check-input" id="immediate_feedback" name="immediate_feedback">
-        <label class="form-check-label" for="immediate_feedback">Immediate Feedback</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Add Assessment</button>
-</form>
+<div class="container">
+    <h2>Add Formative Assessment</h2>
+    
+    <form action="{{ url_for('add_assessment') }}" method="post" id="add-assessment-form">
+        <div class="mb-3">
+            <label for="name" class="form-label">Assessment Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+
+        <div class="mb-3" id="selected-questions">
+            <!-- Selected questions will be displayed here -->
+        </div>
+
+        <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <input type="number" class="form-control" id="duration" name="duration" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="deadline" class="form-label">Deadline</label>
+            <input type="datetime-local" class="form-control" id="deadline" name="deadline" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="attempts" class="form-label">Attempts Allowed</label>
+            <input type="number" class="form-control" id="attempts" name="attempts" required>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="feedback" name="feedback">
+                <label class="form-check-label" for="feedback">
+                    Enable Instant Feedback
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="add-assessment-btn">Add Assessment</button>
+    </form>
+</div>
+
+<div class="container">
+    <h2>All Questions</h2>
+    <ul>
+        <li style="list-style-type: none"><a href="{{ url_for('add_question') }}" class="btn btn-success">Add Question</a></li>
+    </ul>
+    <form action="{{ url_for('view_questions') }}" method="get" class="mb-3">
+        <label for="type">Select Question Type:</label>
+        <select name="type" id="questions" class="form-select" onchange="this.form.submit()">
+            <option value="all" {% if selected_type == 'all' %}selected{% endif %}>All</option>
+            <option value="type1" {% if selected_type == 'type1' %}selected{% endif %}>Type I</option>
+            <option value="type2" {% if selected_type == 'type2' %}selected{% endif %}>Type II</option>
+        </select>
+    </form>
+    
+    <form method="post">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>ID</th>
+                    <th>Question Type</th>
+                    <th>Question Text</th>
+                    <th>Options</th>
+                    <th>Correct Option</th>
+                    <th>Feedback</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in questions %}
+                <tr>
+                    <td><input type="checkbox" name="selected_questions[]" value="{{ question.id }}"></td>
+                    <td>{{ question.id }}</td>
+                    <td>{{ question.question_type }}</td>
+                    <td>{{ question.question_text }}</td>
+                    <td>
+                        A: {{ question.option_a }}<br>
+                        B: {{ question.option_b }}<br>
+                        C: {{ question.option_c }}<br>
+                        D: {{ question.option_d }}
+                    </td>
+                    <td>{{ question.correct_option }}</td>
+                    <td>{{ question.feedback }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectedQuestionsDiv = document.getElementById("selected-questions");
+        const submitBtn = document.getElementById("add-assessment-btn");
+        const form = document.getElementById("add-assessment-form");
+    
+        const questionsSelect = document.getElementById("questions");
+    
+        questionsSelect.addEventListener("change", function() {
+            const selectedOption = questionsSelect.options[questionsSelect.selectedIndex];
+            if (selectedOption) {
+                const questionText = selectedOption.text;
+                const questionId = selectedOption.value;
+                const newDiv = document.createElement("div");
+                newDiv.innerHTML = `
+                    <input type="hidden" name="selected_questions[]" value="${questionId}">
+                    ${questionText} <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
+                `;
+                selectedQuestionsDiv.appendChild(newDiv);
+            }
+        });
+    
+        selectedQuestionsDiv.addEventListener("click", function(e) {
+            if (e.target && e.target.classList.contains("remove-question")) {
+                e.target.parentElement.remove();
+            }
+        });
+    
+        submitBtn.addEventListener("click", function() {
+            const duration = document.getElementById("duration").value;
+            const attempts = document.getElementById("attempts").value;
+    
+            if (duration <= 0) {
+                alert('Duration must be greater than 0.');
+                event.preventDefault();
+                return;
+            }
+    
+            if (attempts <= 0) {
+                alert('Attempts must be greater than 0.');
+                event.preventDefault();
+                return;
+            }
+    
+            const selectedCount = document.querySelectorAll('input[name="selected_questions[]"]:checked').length;
+            if (selectedCount === 0) {
+                alert('Please select at least one question.');
+                event.preventDefault();
+            }
+        });
+    
+        form.addEventListener("submit", function() {
+            const selectedQuestions = document.querySelectorAll('input[name="selected_questions[]"]');
+            selectedQuestions.forEach(input => {
+                const newInput = document.createElement("input");
+                newInput.type = "hidden";
+                newInput.name = "selected_questions[]";
+                newInput.value = input.value;
+                form.appendChild(newInput);
+            });
+        });
+    });
+    </script>
+    
 {% endblock %}

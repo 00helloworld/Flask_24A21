@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Edit Formative Assessment</h2>
+    
+    <form action="{{ url_for('edit_assessment', assessment_id=assessment.id) }}" method="post">
+        <div class="mb-3">
+            <label for="name" class="form-label">Assessment Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ assessment.name }}" required>
+        </div>
+
+        <div class="mb-3" id="selected-questions">
+            <!-- Selected questions will be displayed here -->
+            {% for question in assessment.questions %}
+            <div>
+                <input type="hidden" name="selected_questions[]" value="{{ question.id }}">
+                {{ question.question_text }} 
+                <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <input type="number" class="form-control" id="duration" name="duration" value="{{ assessment.parameters.get('duration') }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="deadline" class="form-label">Deadline</label>
+            <input type="datetime-local" class="form-control" id="deadline" name="deadline" value="{{ assessment.deadline }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="attempts" class="form-label">Attempts Allowed</label>
+            <input type="number" class="form-control" id="attempts" name="attempts" value="{{ assessment.parameters.get('attempts') }}" required>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="feedback" name="feedback" {% if assessment.parameters.get('feedback') %}checked{% endif %}>
+                <label class="form-check-label" for="feedback">
+                    Enable Instant Feedback
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="update-assessment-btn">Update Assessment</button>
+    </form>
+</div>
+
+<div class="container">
+    <h2>All Questions</h2>
+    <ul>
+        <li style="list-style-type: none"><a href="{{ url_for('add_question') }}" class="btn btn-success">Add Question</a></li>
+    </ul>
+    <form action="{{ url_for('view_questions') }}" method="get" class="mb-3">
+        <label for="type">Select Question Type:</label>
+        <select name="type" id="type" class="form-select" onchange="this.form.submit()">
+            <option value="all" {% if selected_type == 'all' %}selected{% endif %}>All</option>
+            <option value="type1" {% if selected_type == 'type1' %}selected{% endif %}>Type I</option>
+            <option value="type2" {% if selected_type == 'type2' %}selected{% endif %}>Type II</option>
+        </select>
+    </form>
+    
+    <form method="post">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>ID</th>
+                    <th>Question Type</th>
+                    <th>Question Text</th>
+                    <th>Options</th>
+                    <th>Correct Option</th>
+                    <th>Feedback</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in questions %}
+                <tr>
+                    <td><input type="checkbox" name="selected_questions[]" value="{{ question.id }}" {% if question in assessment.questions %}checked{% endif %}></td>
+                    <td>{{ question.id }}</td>
+                    <td>{{ question.question_type }}</td>
+                    <td>{{ question.question_text }}</td>
+                    <td>
+                        A: {{ question.option_a }}<br>
+                        B: {{ question.option_b }}<br>
+                        C: {{ question.option_c }}<br>
+                        D: {{ question.option_d }}
+                    </td>
+                    <td>{{ question.correct_option }}</td>
+                    <td>{{ question.feedback }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const selectedQuestionsDiv = document.getElementById("selected-questions");
+    const updateBtn = document.getElementById("update-assessment-btn");
+
+    const questionsSelect = document.getElementById("questions");
+
+    questionsSelect.addEventListener("change", function() {
+        const selectedOption = questionsSelect.options[questionsSelect.selectedIndex];
+        if (selectedOption) {
+            const questionText = selectedOption.text;
+            const questionId = selectedOption.value;
+            const newDiv = document.createElement("div");
+            newDiv.innerHTML = `
+                <input type="hidden" name="selected_questions[]" value="${questionId}">
+                ${questionText} <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
+            `;
+            selectedQuestionsDiv.appendChild(newDiv);
+        }
+    });
+
+    selectedQuestionsDiv.addEventListener("click", function(e) {
+        if (e.target && e.target.classList.contains("remove-question")) {
+            e.target.parentElement.remove();
+        }
+    });
+
+    updateBtn.addEventListener("click", function() {
+        const selectedCount = document.querySelectorAll('input[name="selected_questions[]"]:checked').length;
+        if (selectedCount === 0) {
+            alert('Please select at least one question.');
+            event.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock %}

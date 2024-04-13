@@ -1,9 +1,14 @@
 from app import db
 
+from app import db
+
 class FormativeAssessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    assessment_name = db.Column(db.String(200), nullable=False)
-    duration = db.Column(db.Integer, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
-    attempts_allowed = db.Column(db.Integer, nullable=False)
-    immediate_feedback = db.Column(db.Boolean, nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    questions = db.relationship('Question', secondary='assessment_question', backref='assessments')
+    parameters = db.Column(db.JSON, nullable=True)
+
+class AssessmentQuestion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    assessment_id = db.Column(db.Integer, db.ForeignKey('formative_assessment.id'), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)

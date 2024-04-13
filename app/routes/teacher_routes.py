@@ -1,7 +1,7 @@
-from flask import render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
 from app import app, db
-from app.models import Question, FormativeAssessment
+from app.models import User, Question, FormativeAssessment, AssessmentQuestion
 
 # @app.route('/tdashboard')
 # def teacher_dashboard():
@@ -39,7 +39,6 @@ def add_question():
         return redirect(url_for('dashboard'))
 
     return render_template('add_question.html')
-
 
 
 @app.route('/view_questions', methods=['GET'])
@@ -98,27 +97,142 @@ def delete_question(question_id):
     return redirect(url_for('view_questions'))
 
 
+# @app.route('/add_assessment', methods=['GET', 'POST'])
+# def add_assessment():
+#     """添加形成性评估功能"""
+#     if 'user_id' not in session or session['role'] != 'teacher':
+#         return redirect(url_for('login'))
+
+#     questions = Question.query.all()
+
+#     if request.method == 'POST':
+#         name = request.form.get('name')
+#         selected_question_ids = request.form.getlist('selected_questions[]')
+#         duration = request.form.get('duration')
+#         deadline = request.form.get('deadline')
+#         attempts = request.form.get('attempts')
+#         feedback = bool(request.form.get('feedback'))
+
+#         assessment = FormativeAssessment(name=name, parameters={
+#             'duration': duration,
+#             'deadline': deadline,
+#             'attempts': attempts,
+#             'feedback': feedback
+#         })
+
+#         for question_id in selected_question_ids:
+#             question = Question.query.get(question_id)
+#             assessment.questions.append(question)
+
+#         db.session.add(assessment)
+#         db.session.commit()
+
+#         flash('Formative Assessment added successfully', 'success')
+#         return redirect(url_for('manage_assessments'))
+
+#     return render_template('add_assessment.html', questions=questions)
+
+assessment_bp = Blueprint('assessment', __name__)
+
 @app.route('/add_assessment', methods=['GET', 'POST'])
 def add_assessment():
-    """添加形成性评估功能"""
-    if 'user_id' not in session or session['role'] != 1:
+    if request.method == 'POST':
+        name = request.form.get('name')
+        duration = request.form.get('duration')
+        deadline = request.form.get('deadline')
+        attempts = request.form.get('attempts')
+        feedback = True if request.form.get('feedback') else False
+        selected_questions = request.form.getlist('selected_questions[]')
+        print(len(selected_questions))
+
+        # Create a new assessment
+        new_assessment = FormativeAssessment(name=name, parameters={
+            'duration': duration,
+            'deadline': deadline,
+            'attempts': attempts,
+            'feedback': feedback
+        })
+        db.session.add(new_assessment)
+
+        # Add selected questions to the assessment
+        for question_id in selected_questions:
+            print('*'*50, question_id)
+            question = Question.query.get(question_id)
+            if question:
+                assessment_question = AssessmentQuestion(assessment_id=new_assessment.id, question_id=question.id)
+                db.session.add(assessment_question)
+
+        try:
+            
+            db.session.commit()
+            flash('Assessment added successfully!', 'success')
+            return redirect(url_for('manage_assessments'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+            print('*'*50, 'ERROR')
+
+    questions = Question.query.all()
+    return render_template('add_assessment.html', questions=questions)
+
+
+
+@app.route('/edit_assessment/<int:assessment_id>', methods=['GET', 'POST'])
+def edit_assessment(assessment_id):
+    """编辑形成性评估功能"""
+    if 'user_id' not in session or session['role'] != 'teacher':
         return redirect(url_for('login'))
 
+    assessment = FormativeAssessment.query.get(assessment_id)
+    
     if request.method == 'POST':
-        assessment_name = request.form.get('assessment_name')
-        duration = request.form.get('duration')
-        end_date = request.form.get('end_date')
-        attempts_allowed = request.form.get('attempts_allowed')
-        immediate_feedback = request.form.get('immediate_feedback') == 'on'
+        name = request.form.get('name')
+        selected_questions = request.form.getlist('questions')
+        parameters = {
+            'duration': request.form.get('duration'),
+            'deadline': request.form.get('deadline'),
+            'attempts': request.form.get('attempts'),
+            'feedback': request.form.get('feedback') == 'on'
+        }
 
-        assessment = FormativeAssessment(assessment_name=assessment_name, duration=duration,
-                                         end_date=end_date, attempts_allowed=attempts_allowed,
-                                         immediate_feedback=immediate_feedback)
-        
-        db.session.add(assessment)
+        assessment.name = name
+        assessment.parameters = parameters
+        assessment.questions.clear()
+
+        for question_id in selected_questions:
+            question = Question.query.get(question_id)
+            if question:
+                assessment.questions.append(question)
+
         db.session.commit()
 
-        flash('Assessment added successfully', 'success')
-        return redirect(url_for('dashboard'))
+        flash('Formative Assessment updated successfully', 'success')
+        return redirect(url_for('manage_assessments'))
 
-    return render_template('add_assessment.html')
+    questions = Question.query.all()
+    return render_template('edit_assessment.html', assessment=assessment, questions=questions)
+
+@app.route('/delete_assessment/<int:assessment_id>', methods=['POST'])
+def delete_assessment(assessment_id):
+    """删除形成性评估功能"""
+    if 'user_id' not in session or session['role'] != 'teacher':
+        return redirect(url_for('login'))
+
+    assessment = FormativeAssessment.query.get(assessment_id)
+    if assessment:
+        db.session.delete(assessment)
+        db.session.commit()
+        flash('Formative Assessment deleted successfully', 'success')
+    else:
+        flash('Formative Assessment not found', 'error')
+
+    return redirect(url_for('manage_assessments'))
+
+@app.route('/manage_assessments', methods=['GET'])
+def manage_assessments():
+    """管理评估功能"""
+    if 'user_id' not in session or session['role'] != 'teacher':
+        return redirect(url_for('login'))
+
+    assessments = FormativeAssessment.query.all()
+    return render_template('manage_assessments.html', assessments=assessments)
