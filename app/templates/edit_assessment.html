@@ -4,7 +4,7 @@
 <div class="container">
     <h2>Edit Formative Assessment</h2>
     
-    <form action="{{ url_for('edit_assessment', assessment_id=assessment.id) }}" method="post">
+    <form action="{{ url_for('edit_assessment', assessment_id=assessment.id) }}" method="post" id="edit-assessment-form">
         <div class="mb-3">
             <label for="name" class="form-label">Assessment Name</label>
             <input type="text" class="form-control" id="name" name="name" value="{{ assessment.name }}" required>
@@ -12,13 +12,7 @@
 
         <div class="mb-3" id="selected-questions">
             <!-- Selected questions will be displayed here -->
-            {% for question in assessment.questions %}
-            <div>
-                <input type="hidden" name="selected_questions[]" value="{{ question.id }}">
-                {{ question.question_text }} 
-                <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
-            </div>
-            {% endfor %}
+            
         </div>
 
         <div class="mb-3">
@@ -56,7 +50,7 @@
     </ul>
     <form action="{{ url_for('view_questions') }}" method="get" class="mb-3">
         <label for="type">Select Question Type:</label>
-        <select name="type" id="type" class="form-select" onchange="this.form.submit()">
+        <select name="type" id="questions" class="form-select" onchange="this.form.submit()">
             <option value="all" {% if selected_type == 'all' %}selected{% endif %}>All</option>
             <option value="type1" {% if selected_type == 'type1' %}selected{% endif %}>Type I</option>
             <option value="type2" {% if selected_type == 'type2' %}selected{% endif %}>Type II</option>
@@ -99,39 +93,66 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const selectedQuestionsDiv = document.getElementById("selected-questions");
-    const updateBtn = document.getElementById("update-assessment-btn");
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectedQuestionsDiv = document.getElementById("selected-questions");
+        const updateBtn = document.getElementById("update-assessment-btn");
+        const form = document.getElementById("edit-assessment-form"); // Changed form id
 
-    const questionsSelect = document.getElementById("questions");
+        const questionsSelect = document.getElementById("questions");
 
-    questionsSelect.addEventListener("change", function() {
-        const selectedOption = questionsSelect.options[questionsSelect.selectedIndex];
-        if (selectedOption) {
-            const questionText = selectedOption.text;
-            const questionId = selectedOption.value;
-            const newDiv = document.createElement("div");
-            newDiv.innerHTML = `
-                <input type="hidden" name="selected_questions[]" value="${questionId}">
-                ${questionText} <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
-            `;
-            selectedQuestionsDiv.appendChild(newDiv);
-        }
+        questionsSelect.addEventListener("change", function() {
+            const selectedOption = questionsSelect.options[questionsSelect.selectedIndex];
+            if (selectedOption) {
+                const questionText = selectedOption.text;
+                const questionId = selectedOption.value;
+                const newDiv = document.createElement("div");
+                newDiv.innerHTML = `
+                    <input type="hidden" name="selected_questions[]" value="${questionId}">
+                    ${questionText} <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
+                `;
+                selectedQuestionsDiv.appendChild(newDiv);
+            }
+        });
+
+        selectedQuestionsDiv.addEventListener("click", function(e) {
+            if (e.target && e.target.classList.contains("remove-question")) {
+                e.target.parentElement.remove();
+            }
+        });
+
+        updateBtn.addEventListener("click", function() {
+            const duration = document.getElementById("duration").value;
+            const attempts = document.getElementById("attempts").value;
+
+            if (duration <= 0) {
+                alert('Duration must be greater than 0.');
+                event.preventDefault();
+                return;
+            }
+
+            if (attempts <= 0) {
+                alert('Attempts must be greater than 0.');
+                event.preventDefault();
+                return;
+            }
+
+            const selectedCount = document.querySelectorAll('input[name="selected_questions[]"]:checked').length;
+            if (selectedCount === 0) {
+                alert('Please select at least one question.');
+                event.preventDefault();
+            }
+        });
+
+        form.addEventListener("submit", function() {
+            const selectedQuestions = document.querySelectorAll('input[name="selected_questions[]"]:checked');
+            selectedQuestions.forEach(input => {
+                const newInput = document.createElement("input");
+                newInput.type = "hidden";
+                newInput.name = "selected_questions[]";
+                newInput.value = input.value;
+                form.appendChild(newInput);
+            });
+        });
     });
-
-    selectedQuestionsDiv.addEventListener("click", function(e) {
-        if (e.target && e.target.classList.contains("remove-question")) {
-            e.target.parentElement.remove();
-        }
-    });
-
-    updateBtn.addEventListener("click", function() {
-        const selectedCount = document.querySelectorAll('input[name="selected_questions[]"]:checked').length;
-        if (selectedCount === 0) {
-            alert('Please select at least one question.');
-            event.preventDefault();
-        }
-    });
-});
 </script>
 {% endblock %}
