@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Edit Question</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label for="question_text" class="form-label">Question Text</label>
+            <textarea class="form-control" id="question_text" name="question_text" rows="3" required>{{ question.question_text }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="option_a" class="form-label">Option A</label>
+            <input type="text" class="form-control" id="option_a" name="option_a" value="{{ question.option_a }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="option_b" class="form-label">Option B</label>
+            <input type="text" class="form-control" id="option_b" name="option_b" value="{{ question.option_b }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="option_c" class="form-label">Option C</label>
+            <input type="text" class="form-control" id="option_c" name="option_c" value="{{ question.option_c }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="option_d" class="form-label">Option D</label>
+            <input type="text" class="form-control" id="option_d" name="option_d" value="{{ question.option_d }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="correct_option" class="form-label">Correct Option</label>
+            <select class="form-control" id="correct_option" name="correct_option" required>
+                <option value="A" {% if question.correct_option == 'A' %}selected{% endif %}>A</option>
+                <option value="B" {% if question.correct_option == 'B' %}selected{% endif %}>B</option>
+                <option value="C" {% if question.correct_option == 'C' %}selected{% endif %}>C</option>
+                <option value="D" {% if question.correct_option == 'D' %}selected{% endif %}>D</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="feedback" class="form-label">Feedback</label>
+            <textarea class="form-control" id="feedback" name="feedback" rows="3" required>{{ question.feedback }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
+{% endblock %}

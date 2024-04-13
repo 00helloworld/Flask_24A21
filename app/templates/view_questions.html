@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>All Questions</h2>
+    <ul>
+        <li style="list-style-type: none"><a href="{{ url_for('add_question') }}" class="btn btn-success">Add Question</a></li>
+    </ul>
+    
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Question Text</th>
+                <th>Options</th>
+                <th>Correct Option</th>
+                <th>Feedback</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for question in questions %}
+            <tr>
+                <td>{{ question.id }}</td>
+                <td>{{ question.question_text }}</td>
+                <td>
+                    A: {{ question.option_a }}<br>
+                    B: {{ question.option_b }}<br>
+                    C: {{ question.option_c }}<br>
+                    D: {{ question.option_d }}
+                </td>
+                <td>{{ question.correct_option }}</td>
+                <td>{{ question.feedback }}</td>
+                <td>
+                    <a href="{{ url_for('edit_question', question_id=question.id) }}" class="btn btn-primary">Edit</a>
+                    <form action="{{ url_for('delete_question', question_id=question.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

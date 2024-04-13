@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyApp</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
@@ -13,8 +13,10 @@
         <div class="container">
             <h1>MyApp</h1>
             <ul>
-                <li><a href="{{ url_for('routes.dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ url_for('routes.logout') }}">Logout</a></li>
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                <li><a href="{{ url_for('register_student') }}">Student Register</a></li>
+                <li><a href="{{ url_for('register_teacher') }}">Teacher Register</a></li>
             </ul>
         </div>
     </nav>
@@ -23,6 +25,19 @@
 <div class="container mt-4">
     {% block content %}
     {% endblock %}
+</div>
+<div class="flash">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+
 </div>
 
 <footer>
