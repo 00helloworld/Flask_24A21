@@ -26,7 +26,7 @@ def add_question():
         option_d = request.form.get('option_d')
         correct_option = request.form.get('correct_option')
         feedback = request.form.get('feedback')
-        question_type = 'Type I'
+        question_type = request.form.get('question_type')  # 'Type 1'
 
         question = Question(question_text=question_text, option_a=option_a, option_b=option_b,
                             option_c=option_c, option_d=option_d, correct_option=correct_option,

@@ -11,6 +11,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Question Type</th>
                 <th>Question Text</th>
                 <th>Options</th>
                 <th>Correct Option</th>
@@ -22,6 +23,7 @@
             {% for question in questions %}
             <tr>
                 <td>{{ question.id }}</td>
+                <td>{{ question.question_type }}</td>
                 <td>{{ question.question_text }}</td>
                 <td>
                     A: {{ question.option_a }}<br>

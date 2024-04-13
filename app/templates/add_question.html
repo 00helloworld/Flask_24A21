@@ -4,6 +4,13 @@
 <h2>Add Question</h2>
 <form method="post">
     <div class="form-group">
+        <label for="question_type">Correct Option:</label>
+        <select class="form-control" id="question_type" name="question_type" required>
+            <option value="Type1">Type1</option>
+            <option value="Type2">Type2</option>
+        </select>
+    </div>
+    <div class="form-group">
         <label for="question_text">Question:</label>
         <textarea class="form-control" id="question_text" name="question_text" required></textarea>
     </div>
