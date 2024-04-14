@@ -3,6 +3,8 @@ from app import app, db
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    session.pop('user_id', None)
+    session.pop('role', None)
     if 'user_id' not in session:
         return redirect(url_for('login'))
     elif session['role'] == 'student':

@@ -7,6 +7,7 @@ class Question(db.Model):
     option_b = db.Column(db.String(200), nullable=False)
     option_c = db.Column(db.String(200), nullable=False)
     option_d = db.Column(db.String(200), nullable=False)
-    correct_option = db.Column(db.String(1), nullable=False)
+    correct_option = db.Column(db.String(100), nullable=False)
+    correct_answer = db.Column(db.Text, nullable=False)
     feedback = db.Column(db.Text, nullable=False)
     question_type = db.Column(db.String(50), nullable=False)

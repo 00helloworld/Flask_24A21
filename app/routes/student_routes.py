@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session
 import datetime
 from app import app, db
-from app.models import User, FormativeAssessment, UserAttempt, AssessmentAttempt, UserAnswer, Question
+from app.models import User, Assessment, UserAttempt, AssessmentAttempt, UserAnswer, Question
 
 
 
@@ -12,7 +12,7 @@ def attempt_assessment(assessment_id):
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
-    assessment = FormativeAssessment.query.get_or_404(assessment_id)
+    assessment = Assessment.query.get_or_404(assessment_id)
     
     # 判断提交次数
     user_attempts = UserAttempt.query.filter_by(user_id=user.id, assessment_id=assessment.id).count()
@@ -31,7 +31,7 @@ def submit_attempt(assessment_id):
         return redirect(url_for('login'))
 
     user = User.query.get(session['user_id'])
-    assessment = FormativeAssessment.query.get_or_404(assessment_id)
+    assessment = Assessment.query.get_or_404(assessment_id)
 
     # Create a new UserAttempt
     user_attempt = UserAttempt(user_id=user.id, assessment_id=assessment.id, score=0.0)
@@ -62,7 +62,7 @@ def submit_attempt(assessment_id):
     # Update the UserAttempt with the total_score and answers
     print(type(user_attempt.answers))
     print('******', user_attempt.answers[0].selected_option)
-    user_attempt.score = (total_score / len(assessment.questions)) * 100
+    user_attempt.score = round((total_score / len(assessment.questions)) * 100, 2)
 
     db.session.commit()
 

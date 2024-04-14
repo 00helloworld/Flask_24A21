@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h2>Edit Formative Assessment</h2>
+    <h2>Edit Assessment</h2>
     
     <form action="{{ url_for('edit_assessment', assessment_id=assessment.id) }}" method="post" id="edit-assessment-form">
         <div class="mb-3">
@@ -10,9 +10,12 @@
             <input type="text" class="form-control" id="name" name="name" value="{{ assessment.name }}" required>
         </div>
 
-        <div class="mb-3" id="selected-questions">
-            <!-- Selected questions will be displayed here -->
-            
+        <div class="mb-3">
+            <label for="assessment_type">Choose Type:</label>
+            <select class="form-control" id="assessment_type" name="assessment_type" required>
+                <option value="FORMATIVE" {% if assessment.type == 'FORMATIVE' %}selected{% endif %}>FORMATIVE</option>
+                <option value="SUMMATIVE" {% if assessment.type == 'SUMMATIVE' %}selected{% endif %}>SUMMATIVE</option>
+            </select>
         </div>
 
         <div class="mb-3">
@@ -48,7 +51,7 @@
     <ul>
         <li style="list-style-type: none"><a href="{{ url_for('add_question') }}" class="btn btn-success">Add Question</a></li>
     </ul>
-    <form action="{{ url_for('view_questions') }}" method="get" class="mb-3">
+    <form action="{{ url_for('manage_questions') }}" method="get" class="mb-3">
         <label for="type">Select Question Type:</label>
         <select name="type" id="questions" class="form-select" onchange="this.form.submit()">
             <option value="all" {% if selected_type == 'all' %}selected{% endif %}>All</option>

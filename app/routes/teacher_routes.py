@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 
 from app import app, db
-from app.models import User, Question, FormativeAssessment, AssessmentQuestion
+from app.models import User, Question, Assessment, AssessmentQuestion
 
 
 @app.route('/add_question', methods=['GET', 'POST'])
@@ -11,18 +11,30 @@ def add_question():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        question_text = request.form.get('question_text')
-        option_a = request.form.get('option_a')
-        option_b = request.form.get('option_b')
-        option_c = request.form.get('option_c')
-        option_d = request.form.get('option_d')
-        correct_option = request.form.get('correct_option')
-        feedback = request.form.get('feedback')
         question_type = request.form.get('question_type')  # 'Type 1'
+        if question_type == 'Type1':
+            question_text = request.form.get('question_text')
+            option_a = request.form.get('option_a')
+            option_b = request.form.get('option_b')
+            option_c = request.form.get('option_c')
+            option_d = request.form.get('option_d')
+            correct_option = request.form.get('correct_option')
+            correct_answer = 'Type1'
+            feedback = request.form.get('feedback')
+        else:
+            question_text = request.form.get('question_text')
+            option_a = 'Type2'
+            option_b = 'Type2'
+            option_c = 'Type2'
+            option_d = 'Type2'
+            correct_option = 'Type2'
+            correct_answer = 'Type2'
+            feedback = request.form.get('feedback')
+        
 
         question = Question(question_text=question_text, option_a=option_a, option_b=option_b,
                             option_c=option_c, option_d=option_d, correct_option=correct_option,
-                            feedback=feedback, question_type=question_type)
+                            correct_answer=correct_answer, feedback=feedback, question_type=question_type)
         
         db.session.add(question)
         db.session.commit()
@@ -95,6 +107,7 @@ def delete_question(question_id):
 def add_assessment():
     if request.method == 'POST':
         name = request.form.get('name')
+        type = request.form.get('assessment_type')
         duration = request.form.get('duration')
         deadline = request.form.get('deadline')
         attempts = request.form.get('attempts')
@@ -104,7 +117,7 @@ def add_assessment():
         print(len(selected_questions))
 
         # Create a new assessment
-        new_assessment = FormativeAssessment(name=name, parameters={
+        new_assessment = Assessment(name=name, type=type, parameters={
             'duration': duration,
             'deadline': deadline,
             'attempts': attempts,
@@ -138,7 +151,7 @@ def add_assessment():
 @app.route('/edit_assessment/<int:assessment_id>', methods=['GET', 'POST'])
 def edit_assessment(assessment_id):
     # Get the assessment to edit
-    assessment = FormativeAssessment.query.get_or_404(assessment_id)
+    assessment = Assessment.query.get_or_404(assessment_id)
 
     if request.method == 'POST':
         name = request.form.get('name')
@@ -191,13 +204,13 @@ def delete_assessment(assessment_id):
     if 'user_id' not in session or session['role'] != 'teacher':
         return redirect(url_for('login'))
 
-    assessment = FormativeAssessment.query.get(assessment_id)
+    assessment = Assessment.query.get(assessment_id)
     if assessment:
         db.session.delete(assessment)
         db.session.commit()
-        flash('Formative Assessment deleted successfully', 'success')
+        flash('Assessment deleted successfully', 'success')
     else:
-        flash('Formative Assessment not found', 'error')
+        flash('Assessment not found', 'error')
 
     return redirect(url_for('manage_assessments'))
 
@@ -207,5 +220,7 @@ def manage_assessments():
     if 'user_id' not in session or session['role'] != 'teacher':
         return redirect(url_for('login'))
 
-    assessments = FormativeAssessment.query.all()
-    return render_template('manage_assessments.html', assessments=assessments)
+    f_assessments = Assessment.query.filter_by(type='FORMATIVE').all()
+    s_assessments = Assessment.query.filter_by(type='SUMMATIVE').all()
+
+    return render_template('manage_assessments.html', f_assessments=f_assessments, s_assessments=s_assessments)

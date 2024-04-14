@@ -3,7 +3,7 @@
 {% block content %}
 <h2>Student Dashboard</h2>
 
-<h3>Assessments</h3>
+<h3>Formative Assessments</h3>
 <table class="custom-table">
     <thead>
         <tr>
@@ -18,7 +18,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for assessment in assessments %}
+        {% for assessment in f_assessments %}
         <tr>
             <td>{{ assessment.id }}</td>
             <td><a href="{{ url_for('attempt_assessment', assessment_id=assessment.id) }}">{{ assessment.name }}</td>
@@ -42,4 +42,46 @@
         {% endfor %}
     </tbody>
 </table>
+
+<h3>Summative Assessments</h3>
+<table class="custom-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Duration</th>
+            <th>Deadline</th>
+            <th>Attempts Allowed</th>
+            <th>Questions</th>
+            <th>Max Score</th>
+            <th>Attempts</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for assessment in s_assessments %}
+        <tr>
+            <td>{{ assessment.id }}</td>
+            <td><a href="{{ url_for('attempt_assessment', assessment_id=assessment.id) }}">{{ assessment.name }}</td>
+            <td>{{ assessment.parameters.get('duration') }}</td>
+            <td>{{ assessment.parameters.get('deadline') }}</td>
+            <td>{{ assessment.parameters.get('attempts') }}</td>
+            <td>
+                {% for question in assessment.questions %}
+                {{ question.question_text }}<br>
+                {% endfor %}
+            </td>
+            <td>
+                <!-- Result -->
+                {{ user_attempts|selectattr('assessment_id', 'equalto', assessment.id)|map(attribute='score')|max }}
+            </td>
+            <td>
+                <!-- Result -->
+                {{ user_attempts|selectattr('assessment_id', 'equalto', assessment.id)|list|length }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
 {% endblock %}

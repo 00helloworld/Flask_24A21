@@ -37,6 +37,8 @@ def logout():
 @app.route('/register/student', methods=['GET', 'POST'])
 def register_student():
     """学生注册功能"""
+    session.pop('user_id', None)
+    session.pop('role', None)
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -61,6 +63,8 @@ def register_student():
 @app.route('/register/teacher', methods=['GET', 'POST'])
 def register_teacher():
     """老师注册功能"""
+    session.pop('user_id', None)
+    session.pop('role', None)
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')

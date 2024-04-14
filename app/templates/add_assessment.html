@@ -1,34 +1,35 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="container">
-    <h2>Add Formative Assessment</h2>
+    <h2>Add Assessment</h2>
     
     <form action="{{ url_for('add_assessment') }}" method="post" id="add-assessment-form">
         <div class="mb-3">
             <label for="name" class="form-label">Assessment Name</label>
             <input type="text" class="form-control" id="name" name="name" required>
         </div>
-
         <div class="mb-3" id="selected-questions">
             <!-- Selected questions will be displayed here -->
         </div>
-
+        <div class="mb-3">
+            <label for="assessment_type">Choose Type:</label>
+            <select class="form-control" id="assessment_type" name="assessment_type" required>
+                <option value="FORMATIVE">FORMATIVE</option>
+                <option value="SUMMATIVE">SUMMATIVE</option>
+            </select>
+        </div>
         <div class="mb-3">
             <label for="duration" class="form-label">Duration (minutes)</label>
             <input type="number" class="form-control" id="duration" name="duration" required>
         </div>
-
         <div class="mb-3">
             <label for="deadline" class="form-label">Deadline</label>
             <input type="datetime-local" class="form-control" id="deadline" name="deadline" required>
         </div>
-
         <div class="mb-3">
             <label for="attempts" class="form-label">Attempts Allowed</label>
             <input type="number" class="form-control" id="attempts" name="attempts" required>
         </div>
-
         <div class="mb-3">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="feedback" name="feedback">
@@ -37,11 +38,9 @@
                 </label>
             </div>
         </div>
-
         <button type="submit" class="btn btn-primary" id="add-assessment-btn">Add Assessment</button>
     </form>
 </div>
-
 <div class="container">
     <h2>All Questions</h2>
     <ul>
@@ -90,7 +89,6 @@
         </table>
     </form>
 </div>
-
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const selectedQuestionsDiv = document.getElementById("selected-questions");

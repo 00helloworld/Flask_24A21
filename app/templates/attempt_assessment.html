@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h2>Attempt Formative Assessment - {{ assessment.name }}</h2>
+    <h2>Attempt Assessment - {{ assessment.name }}</h2>
     
     <form action="{{ url_for('submit_attempt', assessment_id=assessment.id) }}" method="post" id="attempt-assessment-form">
         <div class="mb-3">
