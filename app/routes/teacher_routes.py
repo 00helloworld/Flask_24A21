@@ -36,13 +36,13 @@ def add_question():
         db.session.commit()
 
         flash('Question added successfully', 'success')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('manage_questions'))
 
     return render_template('add_question.html')
 
 
-@app.route('/view_questions', methods=['GET'])
-def view_questions():
+@app.route('/manage_questions', methods=['GET'])
+def manage_questions():
     """查看所有问题功能"""
     if 'user_id' not in session or session['role'] != 'teacher':
         return redirect(url_for('login'))
@@ -56,7 +56,7 @@ def view_questions():
     else:
         questions = Question.query.all()
 
-    return render_template('view_questions.html', questions=questions, selected_type=question_type)
+    return render_template('manage_questions.html', questions=questions, selected_type=question_type)
 
 @app.route('/edit_question/<int:question_id>', methods=['GET', 'POST'])
 def edit_question(question_id):
@@ -79,7 +79,7 @@ def edit_question(question_id):
         db.session.commit()
 
         flash('Question updated successfully', 'success')
-        return redirect(url_for('view_questions'))
+        return redirect(url_for('manage_questions'))
 
     return render_template('edit_question.html', question=question)
 
@@ -94,7 +94,7 @@ def delete_question(question_id):
     db.session.commit()
 
     flash('Question deleted successfully', 'success')
-    return redirect(url_for('view_questions'))
+    return redirect(url_for('manage_questions'))
 
 
 

@@ -6,7 +6,7 @@
     <ul>
         <li style="list-style-type: none"><a href="{{ url_for('add_question') }}" class="btn btn-success">Add Question</a></li>
     </ul>
-    <form action="{{ url_for('view_questions') }}" method="get" class="mb-3">
+    <form action="{{ url_for('manage_questions') }}" method="get" class="mb-3">
         <label for="type">Select Question Type:</label>
         <select name="type" id="type" class="form-select" onchange="this.form.submit()">
             <option value="all" {% if selected_type == 'all' %}selected{% endif %}>All</option>
