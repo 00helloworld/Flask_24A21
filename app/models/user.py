@@ -27,7 +27,7 @@ class UserAttempt(db.Model):
     answers = db.relationship('UserAnswer', backref='user_attempt', lazy=True)
 
     def __repr__(self):
-        return f"UserAttempt('{self.user_id}', '{self.assessment_id}', '{self.score}', '{self.timestamp}')"
+        return f"UserAttempt('{self.user_id}', '{self.assessment_id}', '{self.answers}', '{self.score}', '{self.timestamp}')"
 
 class UserAnswer(db.Model):
     id = db.Column(db.Integer, primary_key=True)

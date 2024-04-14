@@ -3,14 +3,6 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app import app, db
 from app.models import User, Question, FormativeAssessment, AssessmentQuestion
 
-# @app.route('/tdashboard')
-# def teacher_dashboard():
-#     """教师仪表板功能"""
-#     if 'user_id' not in session or session['role'] != 1:
-#         return redirect(url_for('login'))
-
-#     assessments = FormativeAssessment.query.all()
-#     return render_template('teacher_dashboard.html', assessments=assessments)
 
 @app.route('/add_question', methods=['GET', 'POST'])
 def add_question():

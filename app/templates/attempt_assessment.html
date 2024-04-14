@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Attempt Formative Assessment - {{ assessment.name }}</h2>
+    
+    <form action="{{ url_for('submit_attempt', assessment_id=assessment.id) }}" method="post" id="attempt-assessment-form">
+        <div class="mb-3">
+            <label for="name" class="form-label">Assessment Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ assessment.name }}" readonly>
+        </div>
+
+        <div class="mb-3" id="questions-list">
+            <!-- Display questions here -->
+            {% for question in assessment.questions %}
+            <div class="question">
+                <h4>{{ question.question_text }}</h4>
+                
+                <div class="options">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer_{{ question.id }}" id="option_a_{{ question.id }}" value="A">
+                        <label class="form-check-label" for="option_a_{{ question.id }}">
+                            A: {{ question.option_a }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer_{{ question.id }}" id="option_b_{{ question.id }}" value="B">
+                        <label class="form-check-label" for="option_b_{{ question.id }}">
+                            B: {{ question.option_b }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer_{{ question.id }}" id="option_c_{{ question.id }}" value="C">
+                        <label class="form-check-label" for="option_c_{{ question.id }}">
+                            C: {{ question.option_c }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer_{{ question.id }}" id="option_d_{{ question.id }}" value="D">
+                        <label class="form-check-label" for="option_d_{{ question.id }}">
+                            D: {{ question.option_d }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="submit-attempt-btn">Submit Attempt</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById("attempt-assessment-form");
+
+    form.addEventListener("submit", function() {
+        // Validate that each question has been answered
+        const questions = document.querySelectorAll('[id^="option_"]');
+        let allAnswered = true;
+
+        questions.forEach(question => {
+            const questionId = question.id.split('_')[2];
+            const radioButtons = document.querySelectorAll(`[name="answer_${questionId}"]:checked`);
+            if (radioButtons.length === 0) {
+                alert(`Please answer question ${questionId}`);
+                allAnswered = false;
+            }
+        });
+
+        if (!allAnswered) {
+            event.preventDefault();
+        }
+    });
+});
+</script>
+
+{% endblock %}

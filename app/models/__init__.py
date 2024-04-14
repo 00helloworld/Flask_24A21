@@ -1,6 +1,6 @@
 from app import db
 
 from .question import Question
-from .assessment import FormativeAssessment, AssessmentQuestion
-from .user import User, UserAttempt
+from .assessment import FormativeAssessment, AssessmentQuestion, AssessmentAttempt
+from .user import User, UserAttempt, UserAnswer
 from .comment import Comment
