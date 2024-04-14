@@ -11,11 +11,17 @@ def attempt_assessment(assessment_id):
     if 'user_id' not in session or session['role'] != 'student':
         return redirect(url_for('login'))
 
-    if request.method == 'POST':
-        # 处理学生提交的评估答案并保存
-        pass
-
+    user = User.query.get(session['user_id'])
     assessment = FormativeAssessment.query.get_or_404(assessment_id)
+    
+    # 判断提交次数
+    user_attempts = UserAttempt.query.filter_by(user_id=user.id, assessment_id=assessment.id).count()
+    max_attempts = assessment.parameters.get('attempts', 1)  # Default is 1 attempt
+    print(max_attempts)
+    if user_attempts >= int(max_attempts):
+        flash('You have reached the maximum number of attempts for this assessment.', 'danger')
+        return redirect(url_for('dashboard'))
+
     return render_template('attempt_assessment.html', assessment=assessment)
 
 
@@ -57,7 +63,7 @@ def submit_attempt(assessment_id):
     print(type(user_attempt.answers))
     print('******', user_attempt.answers[0].selected_option)
     user_attempt.score = (total_score / len(assessment.questions)) * 100
-    
+
     db.session.commit()
 
     flash('Assessment submitted successfully!', 'success')

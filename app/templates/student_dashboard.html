@@ -13,7 +13,8 @@
             <th>Deadline</th>
             <th>Attempts Allowed</th>
             <th>Questions</th>
-            <th>Result</th>
+            <th>Max Score</th>
+            <th>Attempts</th>
         </tr>
     </thead>
     <tbody>
@@ -31,6 +32,11 @@
             </td>
             <td>
                 <!-- Result -->
+                {{ user_attempts|selectattr('assessment_id', 'equalto', assessment.id)|map(attribute='score')|max }}
+            </td>
+            <td>
+                <!-- Result -->
+                {{ user_attempts|selectattr('assessment_id', 'equalto', assessment.id)|list|length }}
             </td>
         </tr>
         {% endfor %}

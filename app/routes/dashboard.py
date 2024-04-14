@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, session
 
 from app import app, db
 from app.models import FormativeAssessment, UserAttempt
-from app.models import Question, FormativeAssessment
+from app.models import Question, FormativeAssessment, User
 
 
 @app.route('/dashboard')
@@ -24,9 +24,12 @@ def student_dashboard():
     """学生仪表板功能"""
     if 'user_id' not in session or session['role'] != 'student':
         return redirect(url_for('login'))
-
+    
     assessments = FormativeAssessment.query.all()
-    return render_template('student_dashboard.html', assessments=assessments)
+    user = User.query.get(session['user_id'])
+    user_attempts = UserAttempt.query.filter_by(user_id=user.id)
+    
+    return render_template('student_dashboard.html', assessments=assessments, user_attempts=user_attempts)
 
 @app.route('/tdashboard')
 def teacher_dashboard():
