@@ -22,7 +22,7 @@
                 <th>Question Type</th>
                 <th>Question Text</th>
                 <th>Options</th>
-                <th>Correct Option</th>
+                <th>Correct Answer</th>
                 <th>Feedback</th>
                 <th>Actions</th>
             </tr>
@@ -34,12 +34,25 @@
                 <td>{{ question.question_type }}</td>
                 <td>{{ question.question_text }}</td>
                 <td>
+                    {% if question.question_type=='Type1' %}
                     A: {{ question.option_a }}<br>
                     B: {{ question.option_b }}<br>
                     C: {{ question.option_c }}<br>
                     D: {{ question.option_d }}
+                    {% endif %}
+                    {% if question.question_type=='Type2' %}
+
+                    {% endif %}
                 </td>
-                <td>{{ question.correct_option }}</td>
+                <td>
+                    {% if question.question_type=='Type1' %}
+                    {{ question.correct_option }}
+                    {% endif %}
+
+                    {% if question.question_type=='Type2' %}
+                    {{ question.correct_answer }}
+                    {% endif %}
+                </td>
                 <td>{{ question.feedback }}</td>
                 <td>
                     <a href="{{ url_for('edit_question', question_id=question.id) }}" class="btn btn-primary">Edit</a>

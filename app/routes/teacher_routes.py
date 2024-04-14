@@ -28,7 +28,7 @@ def add_question():
             option_c = 'Type2'
             option_d = 'Type2'
             correct_option = 'Type2'
-            correct_answer = 'Type2'
+            correct_answer = request.form.get('correct_answer')
             feedback = request.form.get('feedback')
         
 

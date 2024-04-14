@@ -2,14 +2,16 @@
 
 {% block content %}
 <h2>Add Question</h2>
-<form method="post">
-    <div class="form-group">
-        <label for="question_type">Choose Type:</label>
-        <select class="form-control" id="question_type" name="question_type" required>
-            <option value="Type1">Type1</option>
-            <option value="Type2">Type2</option>
-        </select>
-    </div>
+
+<div class="form-group">
+    <label for="question_type">Choose Type:</label>
+    <select class="form-control" id="question_type" name="question_type" required>
+        <option value="Type1">Type1</option>
+        <option value="Type2">Type2</option>
+    </select>
+</div>
+
+<form method="post" id="type1">
     <div class="form-group">
         <label for="question_text">Question:</label>
         <textarea class="form-control" id="question_text" name="question_text" required></textarea>
@@ -45,4 +47,57 @@
     </div>
     <button type="submit" class="btn btn-primary">Add Question</button>
 </form>
+
+<form method="post" id="type2" style="display:none;">
+    <div class="form-group">
+        <label for="question_text">Question:</label>
+        <textarea class="form-control" id="question_text" name="question_text" required></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="correct_answer">Correct Answer:</label>
+        <textarea class="form-control" id="correct_answer" name="correct_answer" required></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="feedback">Feedback:</label>
+        <textarea class="form-control" id="feedback" name="feedback" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Question</button>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const questionTypeSelect = document.getElementById("question_type");
+        const type1Form = document.getElementById("type1");
+        const type2Form = document.getElementById("type2");
+
+        questionTypeSelect.addEventListener("change", function() {
+            if (questionTypeSelect.value === "Type1") {
+                type1Form.style.display = "block";
+                type2Form.style.display = "none";
+            } else if (questionTypeSelect.value === "Type2") {
+                type1Form.style.display = "none";
+                type2Form.style.display = "block";
+            }
+        });
+
+        type1Form.addEventListener("submit", function() {
+            const selectedTypeInput = document.createElement("input");
+            selectedTypeInput.type = "hidden";
+            selectedTypeInput.name = "question_type";
+            selectedTypeInput.value = "Type1";
+            type1Form.appendChild(selectedTypeInput);
+        });
+
+        type2Form.addEventListener("submit", function() {
+            const selectedTypeInput = document.createElement("input");
+            selectedTypeInput.type = "hidden";
+            selectedTypeInput.name = "question_type";
+            selectedTypeInput.value = "Type2";
+            type2Form.appendChild(selectedTypeInput);
+        });
+    });
+</script>
+
 {% endblock %}
