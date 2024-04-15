@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session
 import datetime
 from app import app, db
-from app.models import User, Assessment, UserAttempt, AssessmentAttempt, UserAnswer, Question
+from app.models import User, Assessment, UserAttempt, UserAnswer, Question
 
 
 

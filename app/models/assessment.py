@@ -15,14 +15,14 @@ class AssessmentQuestion(db.Model):
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
 
 
-class AssessmentAttempt(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_attempt_id = db.Column(db.Integer, db.ForeignKey('user_attempt.id'), nullable=False)
-    assessment_id = db.Column(db.Integer, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    score = db.Column(db.Float, nullable=False)
-    answers = db.Column(db.JSON, nullable=False)  # Storing answers as JSON
+# class AssessmentAttempt(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     user_attempt_id = db.Column(db.Integer, db.ForeignKey('user_attempt.id'), nullable=False)
+#     assessment_id = db.Column(db.Integer, nullable=False)
+#     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+#     score = db.Column(db.Float, nullable=False)
+#     answers = db.Column(db.JSON, nullable=False)  # Storing answers as JSON
 
-    def __repr__(self):
-        return f"AssessmentAttempt('{self.user_attempt_id}', '{self.assessment_id}', '{self.score}', '{self.timestamp}')"
+#     def __repr__(self):
+#         return f"AssessmentAttempt('{self.user_attempt_id}', '{self.assessment_id}', '{self.score}', '{self.timestamp}')"
 
