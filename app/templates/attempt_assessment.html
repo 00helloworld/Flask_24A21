@@ -13,9 +13,10 @@
         <div class="mb-3" id="questions-list">
             <!-- Display questions here -->
             {% for question in assessment.questions %}
+            {% if question.question_type == 'Type1' %}
             <div class="question">
-                <h4>{{ question.question_text }}</h4>
-                
+                <h4>Question {{ loop.index }}:</h4>
+                <p>&emsp;&emsp;<strong>{{ question.question_text }}</strong></p>
                 <div class="options">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="answer_{{ question.id }}" id="option_a_{{ question.id }}" value="A">
@@ -43,6 +44,18 @@
                     </div>
                 </div>
             </div>
+            {% elif question.question_type == 'Type2' %}
+            <div class="question">
+                <h4>Question {{ loop.index }}: </h4>
+                <p>&emsp;&emsp;<strong>{{ question.question_text }}</strong></p>
+                <div class="options">
+                    <div class="form-group">
+                        <label for="text_answer">Answer:</label>
+                        <textarea class="form-control" id="text_answer" name="text_answer_{{ question.id }}" required></textarea>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             {% endfor %}
         </div>
 
@@ -56,10 +69,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     form.addEventListener("submit", function() {
         // Validate that each question has been answered
-        const questions = document.querySelectorAll('[id^="option_"]');
+        const type1_questions = document.querySelectorAll('[id^="option_"]');
         let allAnswered = true;
 
-        questions.forEach(question => {
+        type1_questions.forEach(question => {
             const questionId = question.id.split('_')[2];
             const radioButtons = document.querySelectorAll(`[name="answer_${questionId}"]:checked`);
             if (radioButtons.length === 0) {

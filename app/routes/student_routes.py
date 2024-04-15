@@ -14,7 +14,7 @@ def attempt_assessment(assessment_id):
     user = User.query.get(session['user_id'])
     assessment = Assessment.query.get_or_404(assessment_id)
     
-    # 判断提交次数
+    # 判断提交次数 - html中已判断
     user_attempts = UserAttempt.query.filter_by(user_id=user.id, assessment_id=assessment.id).count()
     max_attempts = assessment.parameters.get('attempts', 1)  # Default is 1 attempt
     print(max_attempts)
@@ -42,22 +42,43 @@ def submit_attempt(assessment_id):
     correct_answers = 0
 
     for question in assessment.questions:
-        selected_option = request.form.get(f"answer_{question.id}")
-        is_correct = selected_option == question.correct_option
+        if question.question_type == 'Type1':
+            selected_option = request.form.get(f"answer_{question.id}")
+            is_correct = selected_option == question.correct_option
 
-        # Update total_score and correct_answers
-        if is_correct:
-            total_score += 1.0
-            correct_answers += 1
+            # Update total_score and correct_answers
+            if is_correct:
+                total_score += 1.0
+                correct_answers += 1
 
-        # Create a new UserAnswer
-        user_answer = UserAnswer(
-            user_attempt_id=user_attempt.id,
-            question_id=question.id,
-            selected_option=selected_option,
-            is_correct=is_correct
-        )
-        db.session.add(user_answer)
+            # Create a new UserAnswer
+            user_answer = UserAnswer(
+                user_attempt_id=user_attempt.id,
+                question_id=question.id,
+                selected_option=selected_option,
+                text_answer='Type1',
+                is_correct=is_correct
+            )
+            db.session.add(user_answer)
+        elif question.question_type == 'Type2':
+            text_answer = request.form.get(f"text_answer_{question.id}")
+            is_correct = text_answer == question.correct_answer
+
+            # Update total_score and correct_answers
+            if is_correct:
+                total_score += 1.0
+                correct_answers += 1
+
+            # Create a new UserAnswer
+            user_answer = UserAnswer(
+                user_attempt_id=user_attempt.id,
+                question_id=question.id,
+                selected_option='E',
+                text_answer=text_answer,
+                is_correct=is_correct
+            )
+            db.session.add(user_answer)
+
 
     # Update the UserAttempt with the total_score and answers
     print(type(user_attempt.answers))

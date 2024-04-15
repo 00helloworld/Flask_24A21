@@ -34,6 +34,7 @@ class UserAnswer(db.Model):
     user_attempt_id = db.Column(db.Integer, db.ForeignKey('user_attempt.id'), nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
     selected_option = db.Column(db.String(1), nullable=False)
+    text_answer = db.Column(db.Text, nullable=False)
     is_correct = db.Column(db.Boolean, nullable=False)
 
     def __repr__(self):
