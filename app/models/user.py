@@ -7,7 +7,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(50), nullable=False)
-    attempts = db.relationship('UserAttempt', backref='user', lazy=True)
+    # attempts = db.relationship('UserAttempt', backref='user', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -23,13 +23,14 @@ class UserAttempt(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer,  db.ForeignKey('user.id'), nullable=False)
     user_name = db.Column(db.Integer,  db.ForeignKey('user.username'), nullable=False)
+    assessment_name = db.Column(db.String(255),  nullable=False)
     assessment_id = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     score = db.Column(db.Float, nullable=False)
     answers = db.relationship('UserAnswer', backref='user_attempt', lazy=True)
 
     def __repr__(self):
-        return f"UserAttempt('{self.user_id}', '{self.assessment_id}', '{self.answers}', '{self.score}', '{self.timestamp}')"
+        return str(self.__dict__)
 
 class UserAnswer(db.Model):
     id = db.Column(db.Integer, primary_key=True)

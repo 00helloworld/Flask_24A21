@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Personal Statistic</h2>
+    <p>Your complete rate is {{ student_complete_rate }}%</p>
+    {% for ass in assessments %}
+    <div class="assessment" data-ass='{{ ass|tojson|safe }}'>
+        <h3>{{ ass['ass_name'] }}</h3>
+        
+        <!-- <p>Average Score: {{ ass['avg_score'] }}</p>
+        <p>Minimum Score: {{ ass['min_score'] }}</p>
+        <p>Maximum Score: {{ ass['max_score'] }}</p> -->
+        <p>Your total attempts for this assessment is {{ ass['atempt_times'] }}, 
+            your average score is {{ ass['avg_score'] }}, your max score is {{ ass['max_score'] }},
+            your min score is {{ ass['min_score'] }}. </p>
+        
+        <!-- 条形图 -->
+        <canvas id="barChart_{{ loop.index }}" class="chart-canvas"></canvas>
+    </div>
+    {% endfor %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.assessment').forEach(function(assessmentDiv) {
+                const ass = JSON.parse(assessmentDiv.getAttribute('data-ass'));
+                const ctx = assessmentDiv.querySelector('canvas').getContext('2d');
+
+                const labels = Array.from({ length: ass.scores.length }, (_, i) => `Attempt ${i + 1}`);
+                const data = {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Scores',
+                        data: ass.scores,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        barPercentage: 0.8,  // 控制每根条的宽度
+                        categoryPercentage: 1  // 控制每根条的宽度
+                    }]
+                };
+
+                const options = {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                fontSize: 20  // 设置字体大小
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                fontSize: 50  // 设置字体大小
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Score Chart'
+                        }
+                    }
+                };
+
+                const canvas = assessmentDiv.querySelector('canvas');
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: data,
+                    options: options
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .chart-canvas {
+            width: 30% !important;  /* 设置canvas的宽度 */
+            height: 100px !important; /* 设置canvas的高度 */
+        }
+    </style>
+</div>
+
+{% endblock %}

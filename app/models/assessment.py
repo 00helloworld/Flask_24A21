@@ -4,7 +4,7 @@ import datetime
 
 class Assessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), unique=True, nullable=False)
     type = db.Column(db.String(255), nullable=False)
     questions = db.relationship('Question', secondary='assessment_question', backref='assessments')
     parameters = db.Column(db.JSON, nullable=True)

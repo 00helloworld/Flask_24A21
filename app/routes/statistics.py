@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, url_for, flash, session
 from app import app, db
 from app.models import UserAttempt
 from app.models import Question, Assessment, User
+from sqlalchemy import func
 
 
 @app.route('/teacher_statistics', methods=['GET', 'POST'])
@@ -10,31 +11,121 @@ def teacher_statistics():
     if 'user_id' not in session or session['role'] != 'teacher':
         return redirect(url_for('login'))
     
-    # test
-    users = db.session.query(User).all()
-    print("*"*10, users[1].attempts)
-    #
+    # 获取session['user_id']对应的UserAttempt数据
+    user_attempts = UserAttempt.query.filter_by().all()
     
-    query = db.session.query(UserAttempt).join(User, UserAttempt.user_id==User.id)
+    # 使用字典来保存每个assessment_id的统计数据
+    assessments = {}
 
-    if request.method == 'POST':
-        # Filter and sort data based on selected criteria
-        date_from = request.form.get('date_from')
-        date_to = request.form.get('date_to')
-        assessment_type = request.form.get('assessment_type')
+    for attempt in user_attempts:
+        if attempt.assessment_name not in assessments:
+            assessments[attempt.assessment_name] = {
+                'count': 0,
+                'max_score': None,
+                'min_score': None,
+                'avg_score': 0,
+                'scores': [],
+                'students': []
+            }
         
-        if date_from and date_to:
-            query = query.filter(
-                UserAttempt.timestamp.between(date_from, date_to)
-            )
+        # 更新统计数据
+        assessments[attempt.assessment_name]['count'] += 1
+        assessments[attempt.assessment_name]['scores'].append(attempt.score)
+        assessments[attempt.assessment_name]['students'].append(attempt.user_name)
         
-        if assessment_type:
-            query = query.join(Assessment).filter(
-                Assessment.name == assessment_type
-            )
+        if assessments[attempt.assessment_name]['max_score'] is None or attempt.score > assessments[attempt.assessment_name]['max_score']:
+            assessments[attempt.assessment_name]['max_score'] = attempt.score
+        
+        if assessments[attempt.assessment_name]['min_score'] is None or attempt.score < assessments[attempt.assessment_name]['min_score']:
+            assessments[attempt.assessment_name]['min_score'] = attempt.score
 
-    attempts = query.all()
-    assessments = Assessment.query.all()
+    # 计算avg_score
+    for assessment in assessments.values():
+        assessment['avg_score'] = sum(assessment['scores']) / assessment['count'] if assessment['count'] > 0 else 0
+        assessment['student_cnt'] = len(set(assessment['students']))
+    all_students = User.query.filter(User.role=='student').all()
+
+    # 将数据格式化为所需的结构
+    formatted_assessments = [{
+        'ass_name': f"{assessment_name}",
+        'atempt_times': assessment['count'],
+        'avg_score': assessment['avg_score'],
+        'min_score': assessment['min_score'],
+        'max_score': assessment['max_score'],
+        'scores': assessment['scores'],
+        'student_cnt': assessment['student_cnt'],
+        'all_student_cnt': len(all_students),
+        'ass_complete_rate': round(assessment['student_cnt']/len(all_students)*100, 1)
+    } for assessment_name, assessment in assessments.items()]
+
+
+    print('*'*10)
+    print(formatted_assessments)
+    print('*'*10)
+    return render_template('statistics_teacher.html', assessments=formatted_assessments, all_students=all_students)
+
+
+
+@app.route('/student_statistics/<student_id>', methods=['GET', 'POST'])
+def student_statistic(student_id=None):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     
+    # 获取session['user_id']对应的UserAttempt数据
+    if session['role'] == 'student':
+        user_attempts = UserAttempt.query.filter_by(user_id=session['user_id']).all()
+    elif student_id:
+        user_attempts = UserAttempt.query.filter_by(user_id=student_id).all()
+    else:
+        return redirect(url_for('login'))
+    
+    student_name = user_attempts[0].user_name
+    
+    # 使用字典来保存每个assessment_id的统计数据
+    assessments = {}
 
-    return render_template('teacher_statistics.html', attempts=attempts, assessments=assessments)
+    for attempt in user_attempts:
+        if attempt.assessment_name not in assessments:
+            assessments[attempt.assessment_name] = {
+                'count': 0,
+                'max_score': None,
+                'min_score': None,
+                'avg_score': 0,
+                'scores': []
+            }
+        
+        # 更新统计数据
+        assessments[attempt.assessment_name]['count'] += 1
+        assessments[attempt.assessment_name]['scores'].append(attempt.score)
+        
+        if assessments[attempt.assessment_name]['max_score'] is None or attempt.score > assessments[attempt.assessment_name]['max_score']:
+            assessments[attempt.assessment_name]['max_score'] = attempt.score
+        
+        if assessments[attempt.assessment_name]['min_score'] is None or attempt.score < assessments[attempt.assessment_name]['min_score']:
+            assessments[attempt.assessment_name]['min_score'] = attempt.score
+
+    # 计算avg_score
+    for assessment in assessments.values():
+        assessment['avg_score'] = sum(assessment['scores']) / assessment['count'] if assessment['count'] > 0 else 0
+
+    # 将数据格式化为所需的结构
+    formatted_assessments = [{
+        'ass_name': f"{assessment_name}",
+        'atempt_times': assessment['count'],
+        'avg_score': assessment['avg_score'],
+        'min_score': assessment['min_score'],
+        'max_score': assessment['max_score'],
+        'scores': assessment['scores']
+    } for assessment_name, assessment in assessments.items()]
+
+    all_assessments = Assessment.query.all()
+    student_complete_rate = round(len(formatted_assessments) / len(all_assessments) * 100, 1)
+
+    print('*'*10)
+    print(formatted_assessments)
+    print('*'*10)
+    return render_template('statistics_student.html', 
+                           assessments=formatted_assessments, 
+                           student_complete_rate=student_complete_rate, 
+                           role=session['role'], 
+                           student_name=student_name)

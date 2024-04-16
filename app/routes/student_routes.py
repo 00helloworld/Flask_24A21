@@ -34,7 +34,8 @@ def submit_attempt(assessment_id):
     assessment = Assessment.query.get_or_404(assessment_id)
 
     # Create a new UserAttempt
-    user_attempt = UserAttempt(user_id=user.id, assessment_id=assessment.id, score=0.0)
+    user_attempt = UserAttempt(user_id=user.id, user_name=user.username, assessment_id=assessment.id, 
+                               assessment_name=assessment.name, score=0.0)
     db.session.add(user_attempt)
     db.session.commit()
 
