@@ -3,17 +3,31 @@
 {% block content %}
 <div class="container">
     <h2>Personal Statistic</h2>
+    {% if role=='student' %}
     <p>Your complete rate is {{ student_complete_rate }}%</p>
+    {% elif role=='teacher' %}
+    <p>{{ student_name }}'s complete rate is {{ student_complete_rate }}%</p>
+    {% endif %}
+
+    <!-- 这里我需要一个筛选选项 -->
+    <!-- 第一个是 日期筛选，选项为：All，或者日期范围，默认为All
+    第二个是 类型选项，选项为：All，Formative，Summative，默认为All -->
+    <!-- 确定按钮，点击后将筛选选项传给flask -->
+
     {% for ass in assessments %}
     <div class="assessment" data-ass='{{ ass|tojson|safe }}'>
         <h3>{{ ass['ass_name'] }}</h3>
         
-        <!-- <p>Average Score: {{ ass['avg_score'] }}</p>
-        <p>Minimum Score: {{ ass['min_score'] }}</p>
-        <p>Maximum Score: {{ ass['max_score'] }}</p> -->
+        {% if role=='student' %}
         <p>Your total attempts for this assessment is {{ ass['atempt_times'] }}, 
             your average score is {{ ass['avg_score'] }}, your max score is {{ ass['max_score'] }},
             your min score is {{ ass['min_score'] }}. </p>
+        {% elif role=='teacher' %}
+        <p>{{ student_name }}'s total attempts for this assessment is {{ ass['atempt_times'] }}, 
+            {{ student_name }}'s average score is {{ ass['avg_score'] }}, {{ student_name }}'s max score is {{ ass['max_score'] }},
+            {{ student_name }}'s min score is {{ ass['min_score'] }}. </p>
+        {% endif %}
+
         
         <!-- 条形图 -->
         <canvas id="barChart_{{ loop.index }}" class="chart-canvas"></canvas>

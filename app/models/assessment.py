@@ -9,6 +9,10 @@ class Assessment(db.Model):
     questions = db.relationship('Question', secondary='assessment_question', backref='assessments')
     parameters = db.Column(db.JSON, nullable=True)
 
+    def __repr__(self):
+        return f"Assessment('{self.name}', '{self.type}', '{self.parameters['deadline']}')"
+
+
 class AssessmentQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), nullable=False)

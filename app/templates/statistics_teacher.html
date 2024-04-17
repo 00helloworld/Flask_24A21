@@ -3,13 +3,26 @@
 {% block content %}
 <div class="container">
     <h2>Overall Statistics</h2>
+    <form action="{{ url_for('teacher_statistic') }}" method="post" id="filter-form">
+        <div class="mb-3">
+            <label for="assessment_type">Choose Type:</label>
+            <select class="form-control" id="assessment_type" name="assessment_type" required>
+                <option value="All">All</option>
+                <option value="FORMATIVE">FORMATIVE</option>
+                <option value="SUMMATIVE">SUMMATIVE</option>
+            </select>
+            <label for="start_time" class="form-label">Deadline From</label>
+            <input type="datetime-local" class="form-control" id="start_time" name="start_time">
+            <label for="end_time" class="form-label"> To</label>
+            <input type="datetime-local" class="form-control" id="end_time" name="end_time">
+            <button type="submit" class="btn btn-primary" id="filter-btn"> Apply Filter</button>
+        </div>
+        
+    </form>
     {% for ass in assessments %}
     <div class="assessment" data-ass='{{ ass|tojson|safe }}'>
         <h3>{{ ass['ass_name'] }}</h3>
         
-        <!-- <p>Average Score: {{ ass['avg_score'] }}</p>
-        <p>Minimum Score: {{ ass['min_score'] }}</p>
-        <p>Maximum Score: {{ ass['max_score'] }}</p> -->
         <p>Total attempts for this assessment is {{ ass['atempt_times'] }}, 
             average score is {{ ass['avg_score'] }}, max score is {{ ass['max_score'] }},
             min score is {{ ass['min_score'] }}, 
@@ -23,7 +36,7 @@
     <h2>Individual Statistics</h2>
     <ul>
         {% for student in all_students %}
-        <li><a href="{{url_for('student_statistic', student_id=student.id)}}">{{ student.username }}</a></li>
+        <li><a href="{{url_for('student_statistic', student_id=student.id)}}">Student Name: {{ student.username }}</a></li>
         {% endfor %}
     </ul>
     
