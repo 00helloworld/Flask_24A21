@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Comment Logs</h2>
+    
+    <table class="comment-table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for comment in comments %}
+            <tr>
+                <td>{{ comment.timestamp }}</td>
+                <td>{{ comment.user_name }}</td>
+                <td>{{ comment.user_role }}</td>
+                <td>
+                    {% if comment.parent_id %}
+                        Replied
+                    {% else %}
+                        Commented
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem;
+    }
+
+    .comment-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .comment-table th, .comment-table td {
+        border: 1px solid #e0e0e0;
+        padding: 8px 12px;
+        text-align: left;
+    }
+
+    .comment-table th {
+        background-color: #f5f5f5;
+    }
+
+    .comment-table tbody tr:hover {
+        background-color: #f0f0f0;
+    }
+</style>
+
+{% endblock %}

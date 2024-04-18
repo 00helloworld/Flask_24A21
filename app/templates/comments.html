@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- 评论表单 -->
+<div class="comment-form">
+    <h2>Post New Comment:</h2>
+    <form method="post" enctype="multipart/form-data" action="{{ url_for('post_comment') }}">
+        <input type="hidden" name="parent_id" value="">
+        <div class="form-group">
+            <textarea class="form-control" id="commentContent" name="content" rows="3" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="commentImage">Upload Image</label>
+            <input type="file" class="form-control-file" id="commentImage" name="image">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<!-- 评论列表 -->
+<div class="comment-list">
+    <h2>Comments List:</h2>
+    {% if user.role == 'teacher' %}
+    <a href="{{ url_for('comment_log') }}">Comments Logs</a>
+    {% endif %}
+    {% for comment in comments %}
+    <div class="comment" style="background-color: aquamarine;">
+
+        <p>{{ comment.user_name }}'s comment:  {{ comment.content }}</p>
+        {% if comment.image %}
+        <img src="{{ url_for('static', filename='images/' + comment.image) }}" 
+        alt="Comment Image" class="comment-image" style="margin-left: 30px;max-width: 100px;max-height: 100px;">
+        {% endif %}
+        <div class="operation">
+            <button class="reply-btn" data-parent="{{ comment.id }}">Reply</button>
+            {% if user.id == comment.user_id or user.role == 'teacher' %}
+            <button class="delete-btn" data-id="{{ comment.id }}">Delete</button>
+            {% endif %}
+        </div>
+        <div class="reply-form" style="display:none;">
+            <form method="post" enctype="multipart/form-data" action="{{ url_for('post_comment') }}">
+                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                <div class="form-group">
+                    <textarea class="form-control" name="content" rows="1" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="replyImage">Upload Image</label>
+                    <input type="file" class="form-control-file" id="replyImage" name="image">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        {% for reply in comment.replies %}
+        <div class="reply" style="margin-left: 30px;">
+            <p>{{ reply.user_name }} replied:  {{ reply.content }}</p>
+            {% if reply.image %}
+            <img src="{{ url_for('static', filename='images/' + reply.image) }}" 
+            style="margin-left: 30px;max-width: 100px;max-height: 100px;" 
+            alt="Reply Image" class="reply-image">
+            {% endif %}
+            <div>
+                <!-- <button class="reply-btn" data-parent="{{ comment.id }}">Reply</button> -->
+                {% if user.id == reply.user_id or user.role == 'teacher' %}
+                <button class="delete-reply-btn" data-id="{{ reply.id }}">Delete</button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const replyBtns = document.querySelectorAll('.reply-btn');
+        replyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const parentId = btn.getAttribute('data-parent');
+                const replyForm = btn.parentElement.nextElementSibling;
+                replyForm.style.display = 'block';
+                replyForm.querySelector('input[name="parent_id"]').value = parentId;
+            });
+        });
+
+        const deleteBtns = document.querySelectorAll('.delete-btn');
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const commentId = btn.getAttribute('data-id');
+                const response = await fetch(`/delete_comment/${commentId}`, {
+                    method: 'DELETE',
+                });
+                const data = await response.json();
+                if (data.success) {
+                    btn.parentElement.parentElement.remove();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+
+        const deleteReplyBtns = document.querySelectorAll('.delete-reply-btn');
+        deleteReplyBtns.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const replyId = btn.getAttribute('data-id');
+                const response = await fetch(`/delete_reply/${replyId}`, {
+                    method: 'DELETE',
+                });
+                const data = await response.json();
+                if (data.success) {
+                    btn.parentElement.remove();
+                } else {
+                    alert(data.message);
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}
