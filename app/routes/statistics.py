@@ -43,8 +43,10 @@ def student_statistic(student_id=None):
     # 获取session['user_id']对应的UserAttempt数据
     if session['role'] == 'student':
         user_attempts = UserAttempt.query.filter_by(user_id=session['user_id']).all()
+        student_name = User.query.filter_by(id=session['user_id']).all()[0].username
     elif student_id:
         user_attempts = UserAttempt.query.filter_by(user_id=student_id).all()
+        student_name = User.query.filter_by(id=student_id).all()[0].username
     else:
         return redirect(url_for('login'))
     
@@ -59,7 +61,7 @@ def student_statistic(student_id=None):
         print('-'*10, assessments_id_filter)
         # print('-'*10, datetime.strptime(start_time, '%Y-%m-%dT%H:%M'))
     
-    student_name = user_attempts[0].user_name
+    
     
     formatted_assessments, all_students = attempt_format(user_attempts, assessments_id_filter)
 

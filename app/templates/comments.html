@@ -25,6 +25,7 @@
     <a href="{{ url_for('comment_log') }}">Comments Logs</a>
     {% endif %}
     {% for comment in comments %}
+    {% if not comment.parent_id %}
     <div class="comment" style="background-color: aquamarine;">
 
         <p>{{ comment.user_name }}'s comment:  {{ comment.content }}</p>
@@ -51,23 +52,25 @@
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
-        {% for reply in comment.replies %}
-        <div class="reply" style="margin-left: 30px;">
-            <p>{{ reply.user_name }} replied:  {{ reply.content }}</p>
-            {% if reply.image %}
-            <img src="{{ url_for('static', filename='images/' + reply.image) }}" 
-            style="margin-left: 30px;max-width: 100px;max-height: 100px;" 
-            alt="Reply Image" class="reply-image">
-            {% endif %}
-            <div>
-                <!-- <button class="reply-btn" data-parent="{{ comment.id }}">Reply</button> -->
-                {% if user.id == reply.user_id or user.role == 'teacher' %}
-                <button class="delete-reply-btn" data-id="{{ reply.id }}">Delete</button>
+        <div class="reply-list"> <!-- Added a div for replies -->
+            {% for reply in comment.replies %}
+            <div class="reply" style="margin-left: 30px;">
+                <p>{{ reply.user_name }} replied:  {{ reply.content }}</p>
+                {% if reply.image %}
+                <img src="{{ url_for('static', filename='images/' + reply.image) }}" 
+                style="margin-left: 30px;max-width: 100px;max-height: 100px;" 
+                alt="Reply Image" class="reply-image">
                 {% endif %}
+                <div>
+                    {% if user.id == reply.user_id or user.role == 'teacher' %}
+                    <button class="delete-reply-btn" data-id="{{ reply.id }}">Delete</button>
+                    {% endif %}
+                </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
+    {% endif %}
     {% endfor %}
 </div>
 
@@ -85,36 +88,45 @@
 
         const deleteBtns = document.querySelectorAll('.delete-btn');
         deleteBtns.forEach(btn => {
-            btn.addEventListener('click', async () => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();  // 阻止默认行为
                 const commentId = btn.getAttribute('data-id');
-                const response = await fetch(`/delete_comment/${commentId}`, {
-                    method: 'DELETE',
-                });
-                const data = await response.json();
-                if (data.success) {
-                    btn.parentElement.parentElement.remove();
-                } else {
-                    alert(data.message);
+                const confirmation = confirm('Are you sure you want to delete this comment?');
+                if (confirmation) {
+                    const response = await fetch(`/delete_comment/${commentId}`, {
+                        method: 'DELETE',
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        btn.parentElement.parentElement.remove();
+                    } else {
+                        alert(data.message);
+                    }
                 }
             });
         });
 
         const deleteReplyBtns = document.querySelectorAll('.delete-reply-btn');
         deleteReplyBtns.forEach(btn => {
-            btn.addEventListener('click', async () => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();  // 阻止默认行为
                 const replyId = btn.getAttribute('data-id');
-                const response = await fetch(`/delete_reply/${replyId}`, {
-                    method: 'DELETE',
-                });
-                const data = await response.json();
-                if (data.success) {
-                    btn.parentElement.remove();
-                } else {
-                    alert(data.message);
+                const confirmation = confirm('Are you sure you want to delete this reply?');
+                if (confirmation) {
+                    const response = await fetch(`/delete_reply/${replyId}`, {
+                        method: 'DELETE',
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        btn.parentElement.parentElement.remove();
+                    } else {
+                        alert(data.message);
+                    }
                 }
             });
         });
     });
 </script>
+
 
 {% endblock %}
