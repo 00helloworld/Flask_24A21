@@ -15,6 +15,7 @@
             <th>Questions</th>
             <th>Max Score</th>
             <th>Attempts</th>
+            <th>Feedbacks</th>
         </tr>
     </thead>
     <tbody>
@@ -38,6 +39,27 @@
                 <!-- Result -->
                 {{ user_attempts|selectattr('assessment_id', 'equalto', assessment.id)|list|length }}
             </td>
+            <td>
+                {% set attempt_cnt = user_attempts|selectattr('assessment_id', 'equalto', assessment.id)|list|length %}
+
+                {% if attempt_cnt>0 %}
+                    {% if assessment.parameters['feedback'] %}
+                        {% for question in assessment.questions %}
+                        {{ question.feedback }}<br>
+                        {% endfor %}
+                    {% else %}
+                        {% if now() > assessment.deadline %}
+                            {% for question in assessment.questions %}
+                            {{ question.feedback }}<br>
+                            {% endfor %}
+                        {% else %}
+                            Will show after deadline.
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    Finish it first.
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -55,6 +77,7 @@
             <th>Questions</th>
             <th>Max Score</th>
             <th>Attempts</th>
+            <th>Feedbacks</th>
         </tr>
     </thead>
     <tbody>
@@ -77,6 +100,27 @@
             <td>
                 <!-- Result -->
                 {{ user_attempts|selectattr('assessment_id', 'equalto', assessment.id)|list|length }}
+            </td>
+            <td>
+                {% set attempt_cnt = user_attempts|selectattr('assessment_id', 'equalto', assessment.id)|list|length %}
+
+                {% if attempt_cnt>0 %}
+                    {% if assessment.parameters['feedback'] %}
+                        {% for question in assessment.questions %}
+                        {{ question.feedback }}<br>
+                        {% endfor %}
+                    {% else %}
+                        {% if now() > assessment.deadline %}
+                            {% for question in assessment.questions %}
+                            {{ question.feedback }}<br>
+                            {% endfor %}
+                        {% else %}
+                            Will show after deadline.
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    Finish it first.
+                {% endif %}
             </td>
         </tr>
         {% endfor %}

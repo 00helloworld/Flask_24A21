@@ -3,6 +3,7 @@ from flask import render_template, request, redirect, url_for, flash, session
 from app import app, db
 from app.models import UserAttempt
 from app.models import Question, Assessment, User
+from datetime import datetime
 
 
 @app.route('/dashboard')
@@ -34,7 +35,15 @@ def student_dashboard():
     else:
         return redirect(url_for('home'))
     
-    return render_template('student_dashboard.html', f_assessments=f_assessments, s_assessments=s_assessments, user_attempts=user_attempts)
+    for assessment in f_assessments:
+        deadline = datetime.strptime(assessment.parameters['deadline'], '%Y-%m-%dT%H:%M')
+        assessment.deadline = deadline
+
+    for assessment in s_assessments:
+        deadline = datetime.strptime(assessment.parameters['deadline'], '%Y-%m-%dT%H:%M')
+        assessment.deadline = deadline
+    
+    return render_template('student_dashboard.html', now=datetime.now, f_assessments=f_assessments, s_assessments=s_assessments, user_attempts=user_attempts)
 
 @app.route('/tdashboard')
 def teacher_dashboard():

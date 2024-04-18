@@ -64,7 +64,7 @@ def student_statistic(student_id=None):
     formatted_assessments, all_students = attempt_format(user_attempts, assessments_id_filter)
 
     all_assessments = Assessment.query.all()
-    student_complete_rate = round(len(formatted_assessments) / len(all_assessments) * 100, 1)
+    student_complete_rate = round(len(set(attempt.assessment_id for attempt in user_attempts)) / len(all_assessments) * 100, 1)
 
     print('*'*10)
     print(formatted_assessments)
