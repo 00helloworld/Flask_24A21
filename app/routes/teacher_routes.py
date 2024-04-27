@@ -73,11 +73,12 @@ def edit_question(question_id):
     if request.method == 'POST':
         question.question_type = request.form.get('question_type')
         question.question_text = request.form.get('question_text')
-        question.option_a = request.form.get('option_a')
-        question.option_b = request.form.get('option_b')
-        question.option_c = request.form.get('option_c')
-        question.option_d = request.form.get('option_d')
-        question.correct_option = request.form.get('correct_option')
+        question.option_a = request.form.get('option_a', 'default')
+        question.option_b = request.form.get('option_b', 'default')
+        question.option_c = request.form.get('option_c', 'default')
+        question.option_d = request.form.get('option_d', 'default')
+        question.correct_option = request.form.get('correct_option', 'default')
+        question.correct_answer = request.form.get('correct_answer', 'default')
         question.feedback = request.form.get('feedback')
 
         db.session.commit()

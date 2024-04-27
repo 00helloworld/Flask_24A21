@@ -7,14 +7,19 @@
         <div class="mb-3">
             <label for="question_type" class="form-label">Question type</label>
             <select class="form-control" id="question_type" name="question_type" required>
-                <option value="Type1" {% if question.question_type == 'Type1' %}selected{% endif %}>Type1</option>
-                <option value="Type2" {% if question.question_type == 'Type2' %}selected{% endif %}>Type2</option>
+                {% if question.question_type == 'Type1' %}
+                <option value="Type1" selected>Type1</option>
+                {% endif %}
+                {% if question.question_type == 'Type2' %}
+                <option value="Type2" selected>Type2</option>
+                {% endif %}
             </select>
         </div>
         <div class="mb-3">
             <label for="question_text" class="form-label">Question Text</label>
             <textarea class="form-control" id="question_text" name="question_text" rows="3" required>{{ question.question_text }}</textarea>
         </div>
+        {% if question.question_type == 'Type1' %}
         <div class="mb-3">
             <label for="option_a" class="form-label">Option A</label>
             <input type="text" class="form-control" id="option_a" name="option_a" value="{{ question.option_a }}" required>
@@ -40,6 +45,13 @@
                 <option value="D" {% if question.correct_option == 'D' %}selected{% endif %}>D</option>
             </select>
         </div>
+        {% endif %}
+        {% if question.question_type == 'Type2' %}
+        <div class="mb-3">
+            <label for="correct_answer" class="form-label">Correct Answer</label>
+            <textarea class="form-control" id="correct_answer" name="correct_answer" rows="3" required>{{ question.correct_answer }}</textarea>
+        </div>
+        {% endif %}
         <div class="mb-3">
             <label for="feedback" class="form-label">Feedback</label>
             <textarea class="form-control" id="feedback" name="feedback" rows="3" required>{{ question.feedback }}</textarea>
